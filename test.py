@@ -41,7 +41,7 @@ class Logowanie():
 
 # if __name__ == '__main__':
 #
-#     # a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','QGqeCt5k2emTdLW8v9aM70A8')
+#     # a = ','','')
 #     # print(a.take_csd_data())
 
 
