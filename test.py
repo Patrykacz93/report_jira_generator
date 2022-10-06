@@ -1,5 +1,4 @@
 from jira import JIRA
-import re
 
 class Logowanie():
 
@@ -13,7 +12,7 @@ class Logowanie():
     def take_csd_data(self, value_of_csd):
 
         for i in self.auth_jira.search_issues('status=pending AND project="Customer Service Desk" AND created > "2022/01/01"', maxResults=1000):
-            if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == 'CSD-' + value_of_csd:
+            if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == value_of_csd:
                 return i.key, i.fields.summary, i.fields.components, i.fields.assignee, \
                        getattr(i.fields, self.nameMap["Quantity"]), i.fields.reporter,
 
@@ -42,16 +41,8 @@ class Logowanie():
 
 # if __name__ == '__main__':
 #
-#
-    # print(a.take_csd_data('CSD-7753'))
+#     # a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','QGqeCt5k2emTdLW8v9aM70A8')
+#     # print(a.take_csd_data())
 
 
-    # test_str = "RMA/2023/06/12  siemanko1323ihczxbdka"
-    #
-    # a = re.findall("^0?(?:[1-30]|1[0-30])\/0?(?:[1-30]|1[0-30]|3[01])\/2\d{3}",test_str)
-    #
-    # print(a)
-    #
-    # b = re.search("^[a-zA-Z0-9]{3}[/.-](\d{4})[/.-](\d{2})[/.-](\d{2})", test_str)
-    # print(b.group())
 
