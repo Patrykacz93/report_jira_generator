@@ -184,6 +184,11 @@ class SecondWindow:
         self.label5 = customtkinter.CTkLabel(self.reporter, text='Reporter:',text_font='OpenSans 10 bold')
         self.label5.pack(side=TOP)
         self.reporter.pack()
+        self.serial_numbers_frame = customtkinter.CTkFrame(self.frame, border_color='black', border=2)
+        self.label6 = customtkinter.CTkLabel(self.serial_numbers_frame, text='Serial Numbers:', text_font='OpenSans 10 bold')
+        self.label6.pack(side=TOP)
+        self.serial_numbers_frame.pack()
+
 
         self.csd_var = StringVar()
 
@@ -194,7 +199,16 @@ class SecondWindow:
                                               corner_radius=8,
                                               text_color='white',
                                               text_font='OpenSans 12 bold')
-        self.button.pack(pady=10, side=BOTTOM)
+        self.button.pack(pady=5, side=BOTTOM)
+
+        self.button = customtkinter.CTkButton(self.frame,
+                                              text="Clear fields",
+                                              command=self.clear_label,
+                                              border_width=0,
+                                              corner_radius=8,
+                                              text_color='white',
+                                              text_font='OpenSans 12 bold')
+        self.button.pack(pady=3, side=BOTTOM)
 
         self.frame_csd = customtkinter.CTkFrame(self.frame, corner_radius=8)
 
@@ -228,7 +242,10 @@ class SecondWindow:
         self.fw_label = customtkinter.CTkLabel(self.frame_form, text='FW: ', corner_radius=8)
         self.fw_label.pack()
 
+        self.fw_var = StringVar()
+
         self.fw_field = customtkinter.CTkEntry(self.frame_form,
+                                               textvariable=self.fw_var,
                                                width=80,
                                                height=27,
                                                corner_radius=8)
@@ -321,6 +338,7 @@ class SecondWindow:
                                         self.first_window_update_function()[1])
 
         self.descriptiontext = textwrap.fill(self.sec_jira_user.take_csd_data(self.csd_var.get())[1], width=20)
+        self.serial_number_twolines = re.sub(r',([^,]*),', r',\1\n', self.sec_jira_user.take_csd_data(self.csd_var.get())[6])
 
         self.label_1 = customtkinter.CTkLabel(self.frame_csd_number, text=self.sec_jira_user.take_csd_data(self.csd_var.get())[0])
         self.label_1.pack(side=BOTTOM)
@@ -334,24 +352,55 @@ class SecondWindow:
         self.label4_1.pack(side=BOTTOM)
         self.label5_1 = customtkinter.CTkLabel(self.reporter, text=self.sec_jira_user.take_csd_data(self.csd_var.get())[5])
         self.label5_1.pack(side=BOTTOM)
+        self.label6_1 = customtkinter.CTkLabel(self.serial_numbers_frame, text=self.serial_number_twolines.replace(' ',''))
+        self.label6_1.pack(side=BOTTOM)
 
     def save_to_docx(self):
 
-        self.rma_regex = re.search("^[a-zA-Z0-9]{3}[/.-](\d{4})[/.-](\d{2})[/.-](\d{2})",self.descriptiontext)
+        self.random_var = 1
 
-        self.dokument = DocxTemplate('RETURN AUTHORIZATION FORM_2.0.docx')
-        self.context = {'rma': self.rma_regex.group(),
-                        'cp': 'BTiB',
-                        'mail': self.sec_jira_user.take_csd_data(self.csd_var.get())[5],
-                        'csd': self.sec_jira_user.take_csd_data(self.csd_var.get())[0],
-                        'date': self.date_field1.get_date(),
-                        'device': self.sec_jira_user.take_csd_data(self.csd_var.get())[2][0],
-                        'sn': '233445',
-                        'fw': '2.1',
-                        'problem': 'nie dziala'}
+        if int(self.sec_jira_user.take_csd_data(self.csd_var.get())[4]) <= self.random_var:
 
-        self.nowydoc = self.dokument.render(self.context)
-        self.dokument.save(self.path + f'/RETURN AUTHORIZATION FORM_{self.sec_jira_user.take_csd_data(self.csd_var.get())[0]}.docx')
+            self.rma_regex = re.search("^[a-zA-Z0-9]{3}[/.-](\d{4})[/.-](\d{2})[/.-](\d{2})",self.descriptiontext)
+
+            self.dokument = DocxTemplate('RETURN AUTHORIZATION FORM_2.0.docx')
+            self.context = {'rma': self.rma_regex.group(),
+                            'cp': 'BTiB',
+                            'mail': self.sec_jira_user.take_csd_data(self.csd_var.get())[5],
+                            'csd': self.sec_jira_user.take_csd_data(self.csd_var.get())[0],
+                            'date': self.date_field1.get_date(),
+                            'device': self.sec_jira_user.take_csd_data(self.csd_var.get())[2][0],
+                            'sn': self.sec_jira_user.take_csd_data(self.csd_var.get())[6],
+                            'fw': self.fw_var.get(),
+                            'problem': self.description_field.get("1.0",'end-1c')}
+
+            self.nowydoc = self.dokument.render(self.context)
+            self.dokument.save(self.path + f'/RETURN AUTHORIZATION FORM_{self.sec_jira_user.take_csd_data(self.csd_var.get())[0]}.docx')
+
+        else:
+
+            self.rma_regex = re.search("^[a-zA-Z0-9]{3}[/.-](\d{4})[/.-](\d{2})[/.-](\d{2})", self.descriptiontext)
+
+            self.dokument = DocxTemplate('RETURN AUTHORIZATION FORM_2.0_loop.docx')
+
+            self.formRows = []
+            self.iterated_serial_numbers = self.sec_jira_user.take_csd_data(self.csd_var.get())[6].replace(' ','')
+
+            for sn_item in self.iterated_serial_numbers.split(','):
+                self.formRows.append({"device": "iSMA-B-"+str(self.sec_jira_user.take_csd_data(self.csd_var.get())[2][0]), "sn": sn_item,
+                                     "fw": self.fw_var.get(), "problem":self.description_field.get("1.0",'end-1c')})
+
+            self.context = {'rma': self.rma_regex.group(),
+                            'cp': 'BTiB',
+                            'mail': self.sec_jira_user.take_csd_data(self.csd_var.get())[5],
+                            'csd': self.sec_jira_user.take_csd_data(self.csd_var.get())[0],
+                            'date': self.date_field1.get_date(),
+                            'formRows': self.formRows
+                            }
+
+
+            self.nowydoc = self.dokument.render(self.context)
+            self.dokument.save(self.path + f'/RETURN AUTHORIZATION FORM_{self.sec_jira_user.take_csd_data(self.csd_var.get())[0]}.docx')
 
     def take_variable(self):
         print(self.description_field.cget('variable'))
@@ -361,6 +410,16 @@ class SecondWindow:
         self.save_label.destroy()
         self.save_label = customtkinter.CTkLabel(self.save_frame, text=self.path)
         self.save_label.pack(pady=5, padx=10)
+
+    def clear_label(self):
+        self.label_1.destroy()
+        self.label1_1.destroy()
+        self.label2_1.destroy()
+        self.label3_1.destroy()
+        self.label4_1.destroy()
+        self.label5_1.destroy()
+        self.label6_1.destroy()
+
 
 
 root = Tk()

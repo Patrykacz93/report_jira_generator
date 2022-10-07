@@ -1,4 +1,5 @@
 from jira import JIRA
+import re
 
 class Logowanie():
 
@@ -12,9 +13,10 @@ class Logowanie():
     def take_csd_data(self, value_of_csd):
 
         for i in self.auth_jira.search_issues('status=pending AND project="Customer Service Desk" AND created > "2022/01/01"', maxResults=1000):
-            if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == value_of_csd:
+            if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == "CSD-" + value_of_csd:
                 return i.key, i.fields.summary, i.fields.components, i.fields.assignee, \
-                       getattr(i.fields, self.nameMap["Quantity"]), i.fields.reporter,
+                       getattr(i.fields, self.nameMap["Quantity"]), i.fields.reporter, \
+                       getattr(i.fields, self.nameMap["Serial Number"])
 
     # def take_csd_data(self):
     #
@@ -41,8 +43,11 @@ class Logowanie():
 
 # if __name__ == '__main__':
 #
-#     # a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','QGqeCt5k2emTdLW8v9aM70A8')
-#     # print(a.take_csd_data())
+#     a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','y7bbI8fdVe51hZKDUEjJEE0E')
+#     b = a.take_csd_data('CSD-7877')[6]
+#     wyjscie = re.sub(r',([^,]*),', r',\1\n', b)
+#     print(wyjscie.replace(' ',''))
+
 
 
 
