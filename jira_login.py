@@ -11,8 +11,9 @@ class Logowanie():
 
     def take_csd_data(self, value_of_csd):
 
-        for i in self.auth_jira.search_issues('status=pending AND project="Customer Service Desk" AND created > "2022/01/01"', maxResults=1000):
-            if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == "CSD-" + value_of_csd:
+        for i in self.auth_jira.search_issues('status=pending or status="Work in progress" or status="Ready for RMA verification" or status=new '
+                                              'AND project="Customer Service Desk" AND created > "2022/01/01"', maxResults=1000):
+            if str(i.fields.issuetype) == 'RMA' and str(i.key) == "CSD-" + value_of_csd:
                 return i.key, i.fields.summary, i.fields.components, i.fields.assignee, \
                        getattr(i.fields, self.nameMap["Quantity"]), i.fields.reporter, \
                        getattr(i.fields, self.nameMap["Serial Number"]), getattr(i.fields, self.nameMap["Organizations"])

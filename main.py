@@ -350,7 +350,7 @@ class SecondWindow:
         self.service_status.pack(padx=3, pady=3)
 
         self.service_combo = customtkinter.CTkComboBox(self.report_frame,
-                                                                 values=["Repair", "Replacement","Other"])
+                                                       values=["Repair", "Replacement","Other"])
         self.service_combo.pack(padx=3, pady=3)
 
         self.button_report_doc = customtkinter.CTkButton(self.report_frame,
