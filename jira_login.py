@@ -1,5 +1,6 @@
 from jira import JIRA
 import re
+import json
 
 class Logowanie():
 
@@ -16,7 +17,7 @@ class Logowanie():
             if str(i.fields.issuetype) == 'RMA' and str(i.fields.status) == 'Pending' and str(i.key) == "CSD-" + value_of_csd:
                 return i.key, i.fields.summary, i.fields.components, i.fields.assignee, \
                        getattr(i.fields, self.nameMap["Quantity"]), i.fields.reporter, \
-                       getattr(i.fields, self.nameMap["Serial Number"])
+                       getattr(i.fields, self.nameMap["Serial Number"]), getattr(i.fields, self.nameMap["Organizations"])
 
     # def take_csd_data(self):
     #
@@ -42,12 +43,14 @@ class Logowanie():
 #               f'{getattr(i.fields, nameMap["Quantity"])}')
 
 # if __name__ == '__main__':
+
+#       a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','qwScpc65dS7qyGkQFIDQCC72')
+# #     b = a.take_csd_data('CSD-7877')[6]
+# #     wyjscie = re.sub(r',([^,]*),', r',\1\n', b)
+# #     print(wyjscie.replace(' ',''))
 #
-#     a = Logowanie('https://globalcontrol5.atlassian.net/','patryk.kaczmarek@gc5.pl','y7bbI8fdVe51hZKDUEjJEE0E')
-#     b = a.take_csd_data('CSD-7877')[6]
-#     wyjscie = re.sub(r',([^,]*),', r',\1\n', b)
-#     print(wyjscie.replace(' ',''))
+#     print(a.take_csd_data('7892')[7][0].name)
 
-
-
+# zmienna = "INNON"
+#
 
